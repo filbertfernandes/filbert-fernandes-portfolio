@@ -17,3 +17,33 @@ body
     left: 0;
     outline: none;
 }
+
+.toggle-buttons {
+    width: 200px;
+    height: 100px;
+    position: fixed;
+    top: 36px;
+    right: 48px;
+    z-index: 2;
+    background-color: white;
+}
+
+.theme-toggle-button {
+    width: auto;
+    height: 48px;
+    cursor: pointer;
+    background-color: salmon;
+    margin-bottom: 10px;
+
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-button:hover {
+    transform: scale(1.05);
+}
+
+.theme-toggle-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}

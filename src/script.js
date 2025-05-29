@@ -3,6 +3,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
+import gsap from "gsap";
+
+import themeVertexShader from "./shaders/theme/vertex.glsl";
+import themeFragmentShader from "./shaders/theme/fragment.glsl";
+
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -91,6 +96,38 @@ const glassMaterial = new THREE.MeshPhysicalMaterial({
   specularColor: 0xfbfbfb,
 });
 
+const createMaterialForTextureSet = (textureSet) => {
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      uDayTexture1: { value: loadedTextures.day.First },
+      uNightTexture1: { value: loadedTextures.night.First },
+      uNightLightTexture1: { value: loadedTextures.nightLight.First },
+      uDayTexture2: { value: loadedTextures.day.Second },
+      uNightTexture2: { value: loadedTextures.night.Second },
+      uNightLightTexture2: { value: loadedTextures.nightLight.Second },
+      uMixRatioTheme: { value: 0 },
+      uMixRatioLight: { value: 0 },
+      uTextureSet: { value: textureSet },
+    },
+    vertexShader: themeVertexShader,
+    fragmentShader: themeFragmentShader,
+  });
+
+  Object.entries(material.uniforms).forEach(([key, uniform]) => {
+    if (uniform.value instanceof THREE.Texture) {
+      uniform.value.minFilter = THREE.LinearFilter;
+      uniform.value.magFilter = THREE.LinearFilter;
+    }
+  });
+
+  return material;
+};
+
+const roomMaterials = {
+  First: createMaterialForTextureSet(1),
+  Second: createMaterialForTextureSet(2),
+};
+
 
 /**
  * Load Models
@@ -108,9 +145,7 @@ gltfLoader.load('/models/filbert_room_folio.glb', (glb) => {
             else {
                 Object.keys(textureMap).forEach((key) => {
                     if (child.name.includes(key)) {
-                        const material = new THREE.MeshBasicMaterial({
-                            map: loadedTextures.nightLight[key],
-                        })
+                        const material = roomMaterials[key]
     
                         child.material = material
 
@@ -165,6 +200,66 @@ scene.add(camera)
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.target.set(-0.7441870552433264, 3.051084299332125, -1.9247339317163805)
+
+/**
+ * Event Listeners
+ */
+const themeToggleButton = document.querySelector(".theme-toggle-button");
+let isNightMode = false;
+
+const handleThemeToggle = (e) => {
+    e.preventDefault();
+
+    // Disable the toggle button
+    themeToggleButton.classList.add('disabled')
+    isNightMode = !isNightMode;
+
+    const timelines = [];
+
+    Object.values(roomMaterials).forEach((material) => {
+        const tl = gsap.timeline();
+        timelines.push(tl);
+
+        if (isNightMode) {
+            tl.to(material.uniforms.uMixRatioTheme, {
+                value: 1,
+                duration: 1.2,
+                ease: "power2.inOut",
+            }).to(material.uniforms.uMixRatioLight, {
+                value: 1,
+                duration: 0.6,
+                ease: "power2.inOut",
+            }, "+=0.1");
+        } else {
+            tl.to(material.uniforms.uMixRatioLight, {
+                value: 0,
+                duration: 0.6,
+                ease: "power2.inOut",
+            }).to(material.uniforms.uMixRatioTheme, {
+                value: 0,
+                duration: 1.2,
+                ease: "power2.inOut",
+            });
+        }
+    });
+
+    // Wait for the longest timeline to finish before enabling the button
+    // (assumes all timelines start at the same time)
+    const longestDuration = isNightMode ? 1.5 + 0.1 + 0.6 : 0.6 + 1.5;
+    gsap.delayedCall(longestDuration, () => {
+        themeToggleButton.classList.remove('disabled')
+    });
+};
+
+
+// Click event listeners
+themeToggleButton.addEventListener(
+  "click",
+  (e) => {
+    handleThemeToggle(e);
+  },
+  { passive: false }
+);
 
 /**
  * Renderer
