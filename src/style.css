@@ -1,21 +1,15 @@
-*
-{
-    margin: 0;
-    padding: 0;
-}
+@import "tailwindcss";
 
 html,
-body
-{
-    overflow: hidden;
-}
-
-.webgl
+body,
+#root
 {
     position: fixed;
     top: 0;
     left: 0;
-    outline: none;
+    width: 100%;
+    height: 100%;
+    background: black;
 }
 
 .toggle-buttons {
