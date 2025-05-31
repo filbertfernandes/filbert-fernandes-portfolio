@@ -41,3 +41,11 @@ body,
   pointer-events: none;
   cursor: not-allowed;
 }
+
+.htmlScreen iframe
+{
+    width: 1125px;
+    height: 687px;
+    border: none;
+    background: #000000;
+}

@@ -1,6 +1,6 @@
-import { useGLTF, useTexture } from "@react-three/drei";
+import { Html, useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 
 import vertexShader from "../shaders/theme/vertex.glsl";
@@ -115,6 +115,23 @@ export default function Room ({ isNight }) {
             depthWrite: false,
             specularColor: 0xfbfbfb,
           });
+        } else if (child.name.includes("Screen")) {
+          const videoElement = document.createElement("video");
+          videoElement.src = "/textures/video/Screen.mp4";
+          videoElement.loop = true;
+          videoElement.muted = true;
+          videoElement.playsInline = true;
+          videoElement.autoplay = true;
+          videoElement.playbackRate = 0.5;
+          videoElement.play();
+
+          const videoTexture = new THREE.VideoTexture(videoElement);
+          videoTexture.colorSpace = THREE.SRGBColorSpace;
+          videoTexture.flipY = true;
+
+          child.material = new THREE.MeshBasicMaterial({
+                              map: videoTexture,
+                            });
         } else {
           Object.keys(roomMaterials).forEach((key) => {
             if (child.name.includes(key)) {
@@ -166,20 +183,31 @@ export default function Room ({ isNight }) {
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    const baseAmplitude = Math.PI / 4;
+    const baseAmplitude = Math.PI / 6;
+    const bias = -1 // adjust this value to control how much extra bias to the left
 
     fansRef.current.forEach((fan) => {
       fan.rotation.y -= 0.02;
     });
 
     if (chairTopRef.current) {
-      const rotationOffset = baseAmplitude * 
-                              Math.sin(time * 0.45) * 
-                              (1 - Math.abs(Math.sin(time * 0.45)) * 0.3);
-
+      // Shifting the sine value produces asymmetric amplitude while keeping the cosine derivative intact.
+      const rotationOffset = baseAmplitude * (Math.sin(time * 0.5) - bias);
       chairTopRef.current.rotation.y = chairTopRef.current.userData.initialRotation.y - rotationOffset;
     }
-  })
+  });
 
-  return <primitive ref={groupRef} object={scene} />;
+  return (
+    <primitive ref={groupRef} object={scene}>
+      {/* <Html
+          transform
+          wrapperClass="htmlScreen"
+          distanceFactor={ 0.97 }
+          position={ [ -3.1, 4.840, -0.307 ] }
+          rotation-y={ Math.PI / 2}
+      >
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/VQRLujxTm3c?si=t-t-Ty3bbkQLPHQt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </Html> */}
+    </primitive>
+  );
 };
