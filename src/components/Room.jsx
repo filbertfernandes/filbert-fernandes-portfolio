@@ -6,6 +6,7 @@ import gsap from "gsap";
 import vertexShader from "../shaders/theme/vertex.glsl";
 import fragmentShader from "../shaders/theme/fragment.glsl";
 import { useFrame } from "@react-three/fiber";
+import { GiClick } from "react-icons/gi";
 
 const textureMap = {
   First: {
@@ -48,15 +49,16 @@ const useRoomTextures = () => {
   return { day, night, nightLight };
 };
 
-export default function Room ({ isNight }) {
+export default function Room ({ isNight, handleChairClick }) {
   const groupRef = useRef();
   const { scene } = useGLTF("/models/filbert_room_folio.glb");
   const { day, night, nightLight } = useRoomTextures();
 
+  const [roomMaterials, setRoomMaterials] = useState({});
+  const [isClicked, setIsClicked] = useState(false);
+
   const chairTopRef = useRef(null);
   const fansRef = useRef([]);
-
-  const [roomMaterials, setRoomMaterials] = useState({});
 
   const environmentMap = new THREE.CubeTextureLoader()
     .setPath("textures/skybox/")
@@ -115,23 +117,6 @@ export default function Room ({ isNight }) {
             depthWrite: false,
             specularColor: 0xfbfbfb,
           });
-        } else if (child.name.includes("Screen")) {
-          const videoElement = document.createElement("video");
-          videoElement.src = "/textures/video/Screen.mp4";
-          videoElement.loop = true;
-          videoElement.muted = true;
-          videoElement.playsInline = true;
-          videoElement.autoplay = true;
-          videoElement.playbackRate = 0.5;
-          videoElement.play();
-
-          const videoTexture = new THREE.VideoTexture(videoElement);
-          videoTexture.colorSpace = THREE.SRGBColorSpace;
-          videoTexture.flipY = true;
-
-          child.material = new THREE.MeshBasicMaterial({
-                              map: videoTexture,
-                            });
         } else {
           Object.keys(roomMaterials).forEach((key) => {
             if (child.name.includes(key)) {
@@ -187,7 +172,7 @@ export default function Room ({ isNight }) {
     const bias = -1 // adjust this value to control how much extra bias to the left
 
     fansRef.current.forEach((fan) => {
-      fan.rotation.y -= 0.02;
+      fan.rotation.y -= 0.015;
     });
 
     if (chairTopRef.current) {
@@ -199,15 +184,53 @@ export default function Room ({ isNight }) {
 
   return (
     <primitive ref={groupRef} object={scene}>
-      {/* <Html
+      {!isClicked && (
+        <Html
           transform
           wrapperClass="htmlScreen"
           distanceFactor={ 0.97 }
-          position={ [ -3.1, 4.840, -0.307 ] }
+          position={ [ 1, 3, 0.5 ] }
+          rotation-z={-Math.PI / 8}
+          rotation-x={-Math.PI / 4}
+          rotation-y={Math.PI / 4}
+          zIndexRange={[10, 0]}
+        >
+          <GiClick 
+            size={200} 
+            onClick={() => {
+              setIsClicked(true);
+              handleChairClick();
+            }}
+            className="text-white animate-pulse cursor-pointer" 
+          />
+        </Html>
+      )}
+
+      <Html
+          transform
+          wrapperClass="htmlScreen"
+          distanceFactor={ 0.97 }
+          position={ [ -3.089, 4.840, -0.307 ] }
           rotation-y={ Math.PI / 2}
+          occlude="blending"
+          zIndexRange={[10, 0]}
       >
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/VQRLujxTm3c?si=t-t-Ty3bbkQLPHQt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      </Html> */}
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/VQRLujxTm3c?si=U_MP1P6TnR-k9Nui" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </Html>
+
+      <mesh
+        scale={[2, 2, 2]}
+        position={[0.5, 3, -0.8]}
+        onClick={() => {
+          setIsClicked(true);
+          handleChairClick();
+        }}
+        onPointerOver={() => document.body.style.cursor = "pointer"}
+        onPointerOut={() => document.body.style.cursor = "default"}
+        visible={false}
+      >
+        <boxGeometry />
+      </mesh>
     </primitive>
   );
 };

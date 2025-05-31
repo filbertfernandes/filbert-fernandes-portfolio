@@ -10,7 +10,10 @@ const App = () => {
     <div className="relative w-screen h-screen">
       {/* Toggle switch */}
       <button
-        onClick={() => setIsNight((prev) => !prev)}
+        onClick={(event) => {
+          event.stopPropagation()
+          setIsNight((prev) => !prev)
+        }}
         aria-label="Toggle day/night theme"
         className={`z-10 absolute top-6 right-6 w-20 h-10 px-2 cursor-pointer rounded-full transition-all duration-500 ease-in-out
           ${isNight
