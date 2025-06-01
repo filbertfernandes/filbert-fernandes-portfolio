@@ -2,11 +2,13 @@ import { Html, useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
-
-import vertexShader from "../shaders/theme/vertex.glsl";
-import fragmentShader from "../shaders/theme/fragment.glsl";
 import { useFrame } from "@react-three/fiber";
 import { GiClick } from "react-icons/gi";
+
+import themeVertexShader from "../shaders/theme/vertex.glsl";
+import themeFragmentShader from "../shaders/theme/fragment.glsl";
+
+import CoffeeSmoke from "./CoffeeSmoke";
 
 const textureMap = {
   First: {
@@ -49,7 +51,7 @@ const useRoomTextures = () => {
   return { day, night, nightLight };
 };
 
-export default function Room ({ isNight, handleChairClick }) {
+export default function Room({ isNight, handleChairClick }) {
   const groupRef = useRef();
   const { scene } = useGLTF("/models/filbert_room_folio.glb");
   const { day, night, nightLight } = useRoomTextures();
@@ -78,8 +80,8 @@ export default function Room ({ isNight, handleChairClick }) {
             uMixRatioLight: { value: 0 },
             uTextureSet: { value: textureSet },
           },
-          vertexShader: vertexShader,
-          fragmentShader: fragmentShader,
+          vertexShader: themeVertexShader,
+          fragmentShader: themeFragmentShader,
         });
       
         Object.entries(material.uniforms).forEach(([key, uniform]) => {
@@ -231,6 +233,8 @@ export default function Room ({ isNight, handleChairClick }) {
       >
         <boxGeometry />
       </mesh>
+
+      <CoffeeSmoke />
     </primitive>
   );
 };
