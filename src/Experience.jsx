@@ -68,7 +68,7 @@ export default function Experience({ isNight }) {
     };
 
     const handleKeyDown = (event) => {
-      if(event.key === "Escape") {
+      if(event.code === "Escape") {
         handleClick();
       }
     }
