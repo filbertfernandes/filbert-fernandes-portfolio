@@ -217,7 +217,7 @@ export default function Room({ isNight, handleChairClick }) {
           occlude="blending"
           zIndexRange={[10, 0]}
       >
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/VQRLujxTm3c?si=U_MP1P6TnR-k9Nui" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <iframe src="https://filbert-fernandes-portfolio-screen.vercel.app/"></iframe>
       </Html>
 
       <mesh
