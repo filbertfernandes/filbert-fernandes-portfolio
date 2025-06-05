@@ -76,7 +76,28 @@ const App = () => {
           <Experience isNight={isNight} isScreenFocused={isScreenFocused} setIsScreenFocused={setIsScreenFocused} isMobile={isMobile} />
         </Suspense>
       </Canvas>
-      <Loader />
+      <Loader 
+        containerStyles={{
+          backgroundColor: "oklch(21% 0.034 264.665)",
+          margin: "0 auto",
+        }}
+        innerStyles={{
+          width: "20rem",
+        }}
+        barStyles={{
+          backgroundColor: "#ffffff",
+          width: "20rem",
+        }}
+        dataStyles={{
+          color: '#ffffff',
+          fontSize: '1rem',
+          fontWeight: 'bold',
+          fontFamily: 'system-ui',
+          textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          marginTop: '1.5rem',
+        }}
+        dataInterpolation={(p) => `Loading ${Math.round(p)}%`}
+      />
     </div>
   );
 };
