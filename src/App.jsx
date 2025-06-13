@@ -66,7 +66,7 @@ const App = () => {
       {/* Canvas */}
       <Canvas
         camera={{
-          fov: 45,
+          fov: isMobile ? 45 : 43,
           near: 0.1,
           far: 150,
           position: isMobile ? cameraInitialPosition.mobile : cameraInitialPosition.desktop,

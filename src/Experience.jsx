@@ -94,7 +94,7 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
           maxPolarAngle={Math.PI / 2}
           minAzimuthAngle={0}
           maxAzimuthAngle={Math.PI / 2}
-          maxDistance={isMobile ? 39.5 : 20.9}
+          maxDistance={isMobile ? 39.5 : 22}
           minDistance={1}  
         />
         <Room isNight={isNight} handleChairClick={handleChairClick} />
