@@ -78,15 +78,20 @@ const App = () => {
       </Canvas>
       <Loader 
         containerStyles={{
-          backgroundColor: "oklch(21% 0.034 264.665)",
-          margin: "0 auto",
+          backgroundColor: 'oklch(0.44 0.02 229.29)',
+          margin: '0 auto',
         }}
         innerStyles={{
-          width: "20rem",
+          backgroundColor: 'oklch(0.49 0.02 219.83)',
+          width: '20rem',
+          height: '1rem',
+          borderRadius: '0.5rem'
         }}
         barStyles={{
-          backgroundColor: "#ffffff",
-          width: "20rem",
+          backgroundColor: '#ffffff',
+          width: '20rem',
+          height: '1rem',
+          borderRadius: '0.5rem'
         }}
         dataStyles={{
           color: '#ffffff',
@@ -94,7 +99,7 @@ const App = () => {
           fontWeight: 'bold',
           fontFamily: 'system-ui',
           textShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          marginTop: '1.5rem',
+          marginTop: '1rem',
         }}
         dataInterpolation={(p) => `Loading ${Math.round(p)}%`}
       />
