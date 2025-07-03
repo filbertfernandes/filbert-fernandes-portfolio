@@ -114,7 +114,7 @@ export default function Experience({ isNight, isCameraFocused, setIsCameraFocuse
           ref={controlsRef}
           target={isMobile ? orbitControlsTarget.mobile : orbitControlsTarget.desktop} 
           enableDamping
-          enablePan={true}
+          enablePan={false}
           enableRotate={!isCameraFocused}
           minPolarAngle={0}
           maxPolarAngle={Math.PI / 2}
