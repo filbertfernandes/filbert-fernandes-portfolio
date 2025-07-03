@@ -1,13 +1,13 @@
 import { OrbitControls } from "@react-three/drei";
-import Room from "./components/Room";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
 
-import { orbitControlsTarget, cameraInitialPosition, orbitControlsTargetScreenFocused, cameraScreenFocusedPosition } from "./data/initial";
+import Room from "./components/Room.jsx";
+import { orbitControlsTarget, cameraInitialPosition, orbitControlsTargetScreenFocused, cameraPositionScreenFocused, cameraPositionCertificateFocused, orbitControlsTargetCertificateFocused } from "./data/initial";
 
-export default function Experience({ isNight, isScreenFocused, setIsScreenFocused }) {
+export default function Experience({ isNight, isCameraFocused, setIsCameraFocused }) {
   const { camera } = useThree();
 
   const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -15,7 +15,7 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
   const controlsRef = useRef();
 
   const handleChairClick = () => {
-    if(isScreenFocused) return;
+    if(isCameraFocused) return;
 
     const tl = gsap.timeline({ ease: "power3.inOut" });
     
@@ -29,22 +29,48 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
     )
     .to(camera.position, 
         {
-          x: isMobile ? cameraScreenFocusedPosition.mobile[0] : cameraScreenFocusedPosition.desktop[0],
-          y: isMobile ? cameraScreenFocusedPosition.mobile[1] : cameraScreenFocusedPosition.desktop[1],
-          z: isMobile ? cameraScreenFocusedPosition.mobile[2] : cameraScreenFocusedPosition.desktop[2],
+          x: isMobile ? cameraPositionScreenFocused.mobile[0] : cameraPositionScreenFocused.desktop[0],
+          y: isMobile ? cameraPositionScreenFocused.mobile[1] : cameraPositionScreenFocused.desktop[1],
+          z: isMobile ? cameraPositionScreenFocused.mobile[2] : cameraPositionScreenFocused.desktop[2],
           duration: 1,
         },
         "-=1"
     )
     .call(() => {
-      setIsScreenFocused(true);
-      setIsFocused(true);
+      setIsCameraFocused(true);
+    });
+  };
+
+  const handleCertificateClick = () => {
+    if(isCameraFocused) return;
+
+    const tl = gsap.timeline({ ease: "power3.inOut" });
+    
+    tl.to(controlsRef.current.target, 
+      {
+        x: isMobile ? orbitControlsTargetCertificateFocused.mobile[0] : orbitControlsTargetCertificateFocused.desktop[0],
+        y: isMobile ? orbitControlsTargetCertificateFocused.mobile[1] : orbitControlsTargetCertificateFocused.desktop[1],
+        z: isMobile ? orbitControlsTargetCertificateFocused.mobile[2] : orbitControlsTargetCertificateFocused.desktop[2],
+        duration: 1,
+      }
+    )
+    .to(camera.position, 
+        {
+          x: isMobile ? cameraPositionCertificateFocused.mobile[0] : cameraPositionCertificateFocused.desktop[0],
+          y: isMobile ? cameraPositionCertificateFocused.mobile[1] : cameraPositionCertificateFocused.desktop[1],
+          z: isMobile ? cameraPositionCertificateFocused.mobile[2] : cameraPositionCertificateFocused.desktop[2],
+          duration: 1,
+        },
+        "-=1"
+    )
+    .call(() => {
+      setIsCameraFocused(true);
     });
   };
 
   useEffect(() => {
     const goBack = () => {
-      setIsScreenFocused(false);
+      setIsCameraFocused(false);
 
       const tl = gsap.timeline({ ease: "power3.inOut" });
 
@@ -63,11 +89,11 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
             z: isMobile ? cameraInitialPosition.mobile[2] : cameraInitialPosition.desktop[2],
             duration: 1.4,
           },
-          "-=1.5"
+          "-=1.4"
       )
     };
 
-    if(!isScreenFocused) goBack();
+    if(!isCameraFocused) goBack();
 
     const handleKeyDown = (event) => {
       if(event.code === "Escape") {
@@ -80,7 +106,7 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isScreenFocused]);
+  }, [isCameraFocused]);
 
   return (
     <>
@@ -88,16 +114,16 @@ export default function Experience({ isNight, isScreenFocused, setIsScreenFocuse
           ref={controlsRef}
           target={isMobile ? orbitControlsTarget.mobile : orbitControlsTarget.desktop} 
           enableDamping
-          enablePan={false}
-          enableRotate={!isScreenFocused}
+          enablePan={true}
+          enableRotate={!isCameraFocused}
           minPolarAngle={0}
           maxPolarAngle={Math.PI / 2}
           minAzimuthAngle={0}
           maxAzimuthAngle={Math.PI / 2}
-          maxDistance={isMobile ? 39.5 : 22}
+          maxDistance={50}
           minDistance={1}  
         />
-        <Room isNight={isNight} handleChairClick={handleChairClick} />
+        <Room isNight={isNight} handleChairClick={handleChairClick} handleCertificateClick={handleCertificateClick} isCameraFocused={isCameraFocused} />
     </>
     
   )

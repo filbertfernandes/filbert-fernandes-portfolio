@@ -5,12 +5,12 @@ import { IoArrowBack } from "react-icons/io5";
 import { useMediaQuery } from "react-responsive";
 import { Loader } from "@react-three/drei";
 
-import Experience from "./Experience";
-import { cameraInitialPosition } from "./data/initial";
+import Experience from "./Experience.jsx";
+import { cameraInitialPosition } from "./data/initial.js";
 
 const App = () => {
   const [isNight, setIsNight] = useState(false);
-  const [isScreenFocused, setIsScreenFocused] = useState(false);
+  const [isCameraFocused, setIsCameraFocused] = useState(false);
 
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
@@ -18,7 +18,7 @@ const App = () => {
     <div className="relative w-screen h-screen">
       {/* Go back button */}
       <button
-        onClick={() => setIsScreenFocused(false)}
+        onClick={() => setIsCameraFocused(false)}
         className={`z-10 absolute top-6 left-6 px-4 h-10 cursor-pointer text-white
           flex items-center gap-2 rounded-full transition-all duration-500 ease-in-out
           ${isNight 
@@ -27,7 +27,7 @@ const App = () => {
           }
           hover:scale-105 hover:brightness-110
           focus:outline-none active:outline-none active:ring-0
-          ${isScreenFocused ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
+          ${isCameraFocused ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
       >
         <IoArrowBack className="w-5 h-5 text-white" />
         <span className="font-bold">Go back</span>
@@ -73,7 +73,7 @@ const App = () => {
         }}
       >
         <Suspense fallback={null}>
-          <Experience isNight={isNight} isScreenFocused={isScreenFocused} setIsScreenFocused={setIsScreenFocused} isMobile={isMobile} />
+          <Experience isNight={isNight} isCameraFocused={isCameraFocused} setIsCameraFocused={setIsCameraFocused} isMobile={isMobile} />
         </Suspense>
       </Canvas>
       <Loader 
