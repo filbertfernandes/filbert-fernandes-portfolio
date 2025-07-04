@@ -19,11 +19,11 @@ export const orbitControlsTargetScreenFocused = {
 }
 
 export const cameraPositionCertificateFocused = {
-    desktop: [-0.9940293876010273, 7.207178367107293, -0.9385869485290291],
-    mobile: [4.676922172049715, 7.385352209980214, -0.902667296765468],
+    desktop: [-0.9940293876010273, 7.147, -0.9385869485290291],
+    mobile: [4.676922172049715, 7.185, -0.902667296765468],
 }
 
 export const orbitControlsTargetCertificateFocused = {
-    desktop: [-2.751214, 7.15197, -0.949717],
-    mobile: [-2.751213707816067, 7.15197008430592, -0.9497167208797691],
+    desktop: [-2.751214, 7.092, -0.949717],
+    mobile: [-2.751213707816067, 6.952, -0.9497167208797691],
 }
