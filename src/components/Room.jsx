@@ -246,7 +246,10 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
           occlude="blending"
           zIndexRange={[10, 0]}
       >
-          <iframe src="https://filbert-fernandes-portfolio-screen.vercel.app/"></iframe>
+          <iframe 
+            src="https://filbert-fernandes-portfolio-screen.vercel.app/" 
+            className="outline-none select-none pointer-events-auto" 
+          />
       </Html>
 
       <mesh
