@@ -1,5 +1,14 @@
 import { Html, useGLTF, useTexture } from "@react-three/drei";
-import { SRGBColorSpace, LinearFilter, CubeTextureLoader, ShaderMaterial, Texture, MeshPhysicalMaterial, DoubleSide, Euler } from "three";
+import {
+  SRGBColorSpace,
+  LinearFilter,
+  CubeTextureLoader,
+  ShaderMaterial,
+  Texture,
+  MeshPhysicalMaterial,
+  DoubleSide,
+  Euler,
+} from "three";
 import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { useFrame } from "@react-three/fiber";
@@ -31,27 +40,32 @@ const useRoomTextures = () => {
   Object.entries(textureMap).forEach(([key, paths]) => {
     day[key] = useTexture(paths.day);
     day[key].flipY = false;
-    day[key].colorSpace = SRGBColorSpace
-    day[key].minFilter = LinearFilter
-    day[key].magFilter = LinearFilter
+    day[key].colorSpace = SRGBColorSpace;
+    day[key].minFilter = LinearFilter;
+    day[key].magFilter = LinearFilter;
 
     night[key] = useTexture(paths.night);
     night[key].flipY = false;
-    night[key].colorSpace = SRGBColorSpace
-    night[key].minFilter = LinearFilter
-    night[key].magFilter = LinearFilter
+    night[key].colorSpace = SRGBColorSpace;
+    night[key].minFilter = LinearFilter;
+    night[key].magFilter = LinearFilter;
 
     nightLight[key] = useTexture(paths.nightLight);
     nightLight[key].flipY = false;
-    nightLight[key].colorSpace = SRGBColorSpace
-    nightLight[key].minFilter = LinearFilter
-    nightLight[key].magFilter = LinearFilter
+    nightLight[key].colorSpace = SRGBColorSpace;
+    nightLight[key].minFilter = LinearFilter;
+    nightLight[key].magFilter = LinearFilter;
   });
 
   return { day, night, nightLight };
 };
 
-export default function Room({ isNight, handleChairClick, handleCertificateClick, isCameraFocused }) {
+export default function Room({
+  isNight,
+  handleChairClick,
+  handleCertificateClick,
+  isCameraFocused,
+}) {
   const groupRef = useRef();
   const { scene } = useGLTF("/models/filbert_room_folio.glb");
   const { day, night, nightLight } = useRoomTextures();
@@ -70,37 +84,36 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
   useEffect(() => {
     const createMaterialForTextureSet = (textureSet) => {
       const material = new ShaderMaterial({
-          uniforms: {
-            uDayTexture1: { value: day.First },
-            uNightTexture1: { value: night.First },
-            uNightLightTexture1: { value: nightLight.First },
-            uDayTexture2: { value: day.Second },
-            uNightTexture2: { value: night.Second },
-            uNightLightTexture2: { value: nightLight.Second },
-            uMixRatioTheme: { value: 0 },
-            uMixRatioLight: { value: 0 },
-            uTextureSet: { value: textureSet },
-          },
-          vertexShader: themeVertexShader,
-          fragmentShader: themeFragmentShader,
-        });
-      
-        Object.entries(material.uniforms).forEach(([key, uniform]) => {
-          if (uniform.value instanceof Texture) {
-            uniform.value.minFilter = LinearFilter;
-            uniform.value.magFilter = LinearFilter;
-          }
-        });
-      
-        return material;
+        uniforms: {
+          uDayTexture1: { value: day.First },
+          uNightTexture1: { value: night.First },
+          uNightLightTexture1: { value: nightLight.First },
+          uDayTexture2: { value: day.Second },
+          uNightTexture2: { value: night.Second },
+          uNightLightTexture2: { value: nightLight.Second },
+          uMixRatioTheme: { value: 0 },
+          uMixRatioLight: { value: 0 },
+          uTextureSet: { value: textureSet },
+        },
+        vertexShader: themeVertexShader,
+        fragmentShader: themeFragmentShader,
+      });
+
+      Object.entries(material.uniforms).forEach(([key, uniform]) => {
+        if (uniform.value instanceof Texture) {
+          uniform.value.minFilter = LinearFilter;
+          uniform.value.magFilter = LinearFilter;
+        }
+      });
+
+      return material;
     };
-    
+
     setRoomMaterials({
-        First: createMaterialForTextureSet(1),
-        Second: createMaterialForTextureSet(2),
+      First: createMaterialForTextureSet(1),
+      Second: createMaterialForTextureSet(2),
     });
-  }, [])
-  
+  }, []);
 
   useEffect(() => {
     scene.traverse((child) => {
@@ -123,22 +136,24 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
         } else {
           Object.keys(roomMaterials).forEach((key) => {
             if (child.name.includes(key)) {
-                child.material = roomMaterials[key];
+              child.material = roomMaterials[key];
 
-                if (child.name.includes("Double_Side")) {
-                  child.material.side = DoubleSide;
-                }
+              if (child.name.includes("Double_Side")) {
+                child.material.side = DoubleSide;
+              }
 
-                if (child.name.includes("Chair_Top")) {
-                  chairTopRef.current = child;
-                  if (!child.userData.initialRotation) {
-                    child.userData.initialRotation = new Euler().copy(child.rotation);
-                  }
+              if (child.name.includes("Chair_Top")) {
+                chairTopRef.current = child;
+                if (!child.userData.initialRotation) {
+                  child.userData.initialRotation = new Euler().copy(
+                    child.rotation
+                  );
                 }
-                
-                if (child.name.includes("Fan")) {
-                  fansRef.current.push(child);
-                }
+              }
+
+              if (child.name.includes("Fan")) {
+                fansRef.current.push(child);
+              }
             }
           });
         }
@@ -173,10 +188,10 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
     });
   }, [isNight]);
 
+  const baseAmplitude = Math.PI / 6;
+  const bias = -1; // adjust this value to control how much extra bias to the left
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    const baseAmplitude = Math.PI / 6;
-    const bias = -1 // adjust this value to control how much extra bias to the left
 
     fansRef.current.forEach((fan) => {
       fan.rotation.y -= 0.015;
@@ -185,7 +200,8 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
     if (chairTopRef.current) {
       // Shifting the sine value produces asymmetric amplitude while keeping the cosine derivative intact.
       const rotationOffset = baseAmplitude * (Math.sin(time * 0.5) - bias);
-      chairTopRef.current.rotation.y = chairTopRef.current.userData.initialRotation.y - rotationOffset;
+      chairTopRef.current.rotation.y =
+        chairTopRef.current.userData.initialRotation.y - rotationOffset;
     }
   });
 
@@ -195,21 +211,23 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
         <Html
           transform
           wrapperClass="htmlScreen"
-          distanceFactor={ 0.97 }
-          position={ [ 1, 3, 0.5 ] }
+          distanceFactor={0.97}
+          position={[1, 3, 0.5]}
           rotation-z={-Math.PI / 8}
           rotation-x={-Math.PI / 4}
           rotation-y={Math.PI / 4}
           zIndexRange={[10, 0]}
         >
-          <GiClick 
-            size={200} 
+          <GiClick
+            size={200}
             onClick={() => {
               if (isCameraFocused) return;
               setIsChairClicked(true);
               handleChairClick();
             }}
-            className={`text-white animate-pulse ${isCameraFocused ? "" : "cursor-pointer"}`}
+            className={`text-white animate-pulse ${
+              isCameraFocused ? "" : "cursor-pointer"
+            }`}
           />
         </Html>
       )}
@@ -218,38 +236,39 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
         <Html
           transform
           wrapperClass="htmlScreen"
-          distanceFactor={ 0.97 }
-          position={ [ -3.7, 7, -0.5 ] }
+          distanceFactor={0.97}
+          position={[-3.7, 7, -0.5]}
           rotation-x={-Math.PI / 3}
           rotation-y={Math.PI / 2}
           zIndexRange={[10, 0]}
         >
-          <GiClick 
-            size={200} 
+          <GiClick
+            size={200}
             onClick={() => {
               if (isCameraFocused) return;
               setIsCertificateClicked(true);
               handleCertificateClick();
             }}
-            className={`text-white animate-pulse ${isCameraFocused ? "" : "cursor-pointer"}`}
+            className={`text-white animate-pulse ${
+              isCameraFocused ? "" : "cursor-pointer"
+            }`}
           />
         </Html>
       )}
 
-
       <Html
-          transform
-          wrapperClass="htmlScreen"
-          distanceFactor={ 0.97 }
-          position={ [ -3.089, 4.840, -0.307 ] }
-          rotation-y={ Math.PI / 2}
-          occlude="blending"
-          zIndexRange={[10, 0]}
+        transform
+        wrapperClass="htmlScreen"
+        distanceFactor={0.97}
+        position={[-3.089, 4.84, -0.307]}
+        rotation-y={Math.PI / 2}
+        occlude="blending"
+        zIndexRange={[10, 0]}
       >
-          <iframe 
-            src="https://filbert-fernandes-portfolio-screen.vercel.app/" 
-            className="outline-none select-none pointer-events-auto" 
-          />
+        <iframe
+          src="https://filbert-fernandes-portfolio-screen.vercel.app/"
+          className="outline-none select-none pointer-events-auto"
+        />
       </Html>
 
       <mesh
@@ -261,10 +280,10 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
           handleChairClick();
         }}
         onPointerOver={() => {
-         if (isCameraFocused) return;
-         document.body.style.cursor = "pointer"
+          if (isCameraFocused) return;
+          document.body.style.cursor = "pointer";
         }}
-        onPointerOut={() => document.body.style.cursor = "default"}
+        onPointerOut={() => (document.body.style.cursor = "default")}
         visible={false}
       >
         <boxGeometry />
@@ -280,9 +299,9 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
         }}
         onPointerOver={() => {
           if (isCameraFocused) return;
-          document.body.style.cursor = "pointer"
+          document.body.style.cursor = "pointer";
         }}
-        onPointerOut={() => document.body.style.cursor = "default"}
+        onPointerOut={() => (document.body.style.cursor = "default")}
         visible={false}
       >
         <boxGeometry />
@@ -291,4 +310,4 @@ export default function Room({ isNight, handleChairClick, handleCertificateClick
       <CoffeeSmoke />
     </primitive>
   );
-};
+}
