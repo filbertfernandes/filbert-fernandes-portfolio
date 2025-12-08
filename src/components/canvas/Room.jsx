@@ -14,8 +14,8 @@ import gsap from "gsap";
 import { useFrame } from "@react-three/fiber";
 import { GiClick } from "react-icons/gi";
 
-import themeVertexShader from "../shaders/theme/vertex.glsl";
-import themeFragmentShader from "../shaders/theme/fragment.glsl";
+import themeVertexShader from "./shaders/theme/vertex.glsl";
+import themeFragmentShader from "./shaders/theme/fragment.glsl";
 
 import CoffeeSmoke from "./CoffeeSmoke.jsx";
 

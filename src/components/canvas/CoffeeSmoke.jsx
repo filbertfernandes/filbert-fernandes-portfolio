@@ -1,8 +1,8 @@
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { useRef } from "react";
-import coffeeSmokeVertexShader from "../shaders/coffeeSmoke/vertex.glsl";
-import coffeeSmokeFragmentShader from "../shaders/coffeeSmoke/fragment.glsl";
+import coffeeSmokeVertexShader from "./shaders/coffeeSmoke/vertex.glsl";
+import coffeeSmokeFragmentShader from "./shaders/coffeeSmoke/fragment.glsl";
 
 export default function CoffeeSmoke() {
   const meshRef = useRef();

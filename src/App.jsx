@@ -3,9 +3,9 @@ import { Suspense, useState } from "react";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { IoArrowBack } from "react-icons/io5";
 import { useMediaQuery } from "react-responsive";
-import { Loader } from "@react-three/drei";
 
-import Experience from "./Experience.jsx";
+import Experience from "./components/canvas/Experience.jsx";
+import LoadingScreen from "./components/ui/LoadingScreen.jsx";
 import { cameraInitialPosition } from "./data/initial.js";
 
 const App = () => {
@@ -16,6 +16,8 @@ const App = () => {
 
   return (
     <div className="relative w-screen h-screen">
+      <LoadingScreen />
+
       {/* Go back button */}
       <button
         onClick={() => setIsCameraFocused(false)}
@@ -82,7 +84,7 @@ const App = () => {
           },
         }}
       >
-        <Suspense fallback={null}>
+        <Suspense>
           <Experience
             isNight={isNight}
             isCameraFocused={isCameraFocused}
@@ -91,33 +93,6 @@ const App = () => {
           />
         </Suspense>
       </CanvasWrapper>
-      <Loader
-        containerStyles={{
-          backgroundColor: "oklch(0.44 0.02 229.29)",
-          margin: "0 auto",
-        }}
-        innerStyles={{
-          backgroundColor: "oklch(0.49 0.02 219.83)",
-          width: "20rem",
-          height: "1rem",
-          borderRadius: "0.5rem",
-        }}
-        barStyles={{
-          backgroundColor: "#ffffff",
-          width: "20rem",
-          height: "1rem",
-          borderRadius: "0.5rem",
-        }}
-        dataStyles={{
-          color: "#ffffff",
-          fontSize: "1rem",
-          fontWeight: "bold",
-          fontFamily: "system-ui",
-          textShadow: "0 2px 4px rgba(0,0,0,0.2)",
-          marginTop: "1rem",
-        }}
-        dataInterpolation={(p) => `Loading ${Math.round(p)}%`}
-      />
     </div>
   );
 };

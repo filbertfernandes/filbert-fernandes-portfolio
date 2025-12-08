@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
 
-import Room from "./components/Room.jsx";
+import Room from "./Room.jsx";
 import {
   orbitControlsTarget,
   cameraInitialPosition,
@@ -12,7 +12,7 @@ import {
   cameraPositionScreenFocused,
   cameraPositionCertificateFocused,
   orbitControlsTargetCertificateFocused,
-} from "./data/initial";
+} from "../../data/initial";
 
 export default function Experience({
   isNight,
