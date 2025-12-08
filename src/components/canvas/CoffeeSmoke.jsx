@@ -1,5 +1,5 @@
 import { useFrame, useLoader } from "@react-three/fiber";
-import * as THREE from "three";
+import { TextureLoader, RepeatWrapping, DoubleSide } from "three";
 import { useRef } from "react";
 import coffeeSmokeVertexShader from "./shaders/coffeeSmoke/vertex.glsl";
 import coffeeSmokeFragmentShader from "./shaders/coffeeSmoke/fragment.glsl";
@@ -7,10 +7,10 @@ import coffeeSmokeFragmentShader from "./shaders/coffeeSmoke/fragment.glsl";
 export default function CoffeeSmoke() {
   const meshRef = useRef();
   const perlinTexture = useLoader(
-    THREE.TextureLoader,
+    TextureLoader,
     "./textures/perlin/perlin.png"
   );
-  perlinTexture.wrapS = perlinTexture.wrapT = THREE.RepeatWrapping;
+  perlinTexture.wrapS = perlinTexture.wrapT = RepeatWrapping;
 
   const materialRef = useRef();
   const uniformsRef = useRef({
@@ -38,10 +38,12 @@ export default function CoffeeSmoke() {
         vertexShader={coffeeSmokeVertexShader}
         fragmentShader={coffeeSmokeFragmentShader}
         uniforms={uniformsRef.current}
-        side={THREE.DoubleSide}
+        side={DoubleSide}
         transparent
         depthWrite={false}
       />
     </mesh>
   );
 }
+
+useLoader.preload(TextureLoader, "./textures/perlin/perlin.png");

@@ -1,8 +1,7 @@
-import { Html, useGLTF, useTexture } from "@react-three/drei";
+import { Html, useCubeTexture, useGLTF, useTexture } from "@react-three/drei";
 import {
   SRGBColorSpace,
   LinearFilter,
-  CubeTextureLoader,
   ShaderMaterial,
   Texture,
   MeshPhysicalMaterial,
@@ -77,9 +76,10 @@ export default function Room({
   const chairTopRef = useRef(null);
   const fansRef = useRef([]);
 
-  const environmentMap = new CubeTextureLoader()
-    .setPath("textures/skybox/")
-    .load(["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"]);
+  const environmentMap = useCubeTexture(
+    ["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"],
+    { path: "textures/skybox/" }
+  );
 
   useEffect(() => {
     const createMaterialForTextureSet = (textureSet) => {
@@ -311,3 +311,20 @@ export default function Room({
     </primitive>
   );
 }
+
+const preloadRoomTextures = () => {
+  Object.values(textureMap).forEach((paths) => {
+    useTexture.preload(paths.day);
+    useTexture.preload(paths.night);
+    useTexture.preload(paths.nightLight);
+  });
+};
+
+preloadRoomTextures();
+
+useCubeTexture.preload(
+  ["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"],
+  { path: "textures/skybox/" }
+);
+
+useGLTF.preload("/models/filbert_room_folio.glb");

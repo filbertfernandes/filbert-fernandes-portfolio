@@ -21,7 +21,7 @@ const LoadingScreen = () => {
           <div
             className="h-full transition-all duration-500 ease-out rounded-full
               bg-gradient-to-r from-[#f3d36b] to-[#d3af3a]"
-            style={{ width: progress + "%" }}
+            style={{ width: progress + 10 + "%" }}
           />
         </div>
 
