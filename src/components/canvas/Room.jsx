@@ -3,7 +3,6 @@ import {
   SRGBColorSpace,
   LinearFilter,
   ShaderMaterial,
-  Texture,
   MeshPhysicalMaterial,
   DoubleSide,
   Euler,
@@ -17,6 +16,9 @@ import themeVertexShader from "./shaders/theme/vertex.glsl";
 import themeFragmentShader from "./shaders/theme/fragment.glsl";
 
 import CoffeeSmoke from "./CoffeeSmoke.jsx";
+
+const BASE_AMPLITUDE = Math.PI / 6;
+const CHAIR_BIAS = -1;
 
 const textureMap = {
   First: {
@@ -75,6 +77,7 @@ export default function Room({
 
   const chairTopRef = useRef(null);
   const fansRef = useRef([]);
+  const gsapTimelinesRef = useRef([]);
 
   const environmentMap = useCubeTexture(
     ["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"],
@@ -83,7 +86,7 @@ export default function Room({
 
   useEffect(() => {
     const createMaterialForTextureSet = (textureSet) => {
-      const material = new ShaderMaterial({
+      return new ShaderMaterial({
         uniforms: {
           uDayTexture1: { value: day.First },
           uNightTexture1: { value: night.First },
@@ -98,15 +101,6 @@ export default function Room({
         vertexShader: themeVertexShader,
         fragmentShader: themeFragmentShader,
       });
-
-      Object.entries(material.uniforms).forEach(([key, uniform]) => {
-        if (uniform.value instanceof Texture) {
-          uniform.value.minFilter = LinearFilter;
-          uniform.value.magFilter = LinearFilter;
-        }
-      });
-
-      return material;
     };
 
     setRoomMaterials({
@@ -116,6 +110,10 @@ export default function Room({
   }, []);
 
   useEffect(() => {
+    if (Object.keys(roomMaterials).length === 0) return;
+
+    fansRef.current = [];
+
     scene.traverse((child) => {
       if (child.isMesh) {
         if (child.name.includes("Glass")) {
@@ -162,7 +160,8 @@ export default function Room({
   }, [scene, roomMaterials]);
 
   useEffect(() => {
-    Object.values(roomMaterials).forEach((material) => {
+    gsapTimelinesRef.current.forEach((tl) => tl.kill());
+    gsapTimelinesRef.current = Object.values(roomMaterials).map((material) => {
       const tl = gsap.timeline();
       if (isNight) {
         tl.to(material.uniforms.uMixRatioTheme, {
@@ -185,11 +184,20 @@ export default function Room({
           ease: "power2.inOut",
         });
       }
+      return tl;
     });
+
+    return () => {
+      gsapTimelinesRef.current.forEach((tl) => tl.kill());
+    };
   }, [isNight]);
 
-  const baseAmplitude = Math.PI / 6;
-  const bias = -1; // adjust this value to control how much extra bias to the left
+  useEffect(() => {
+    return () => {
+      Object.values(roomMaterials).forEach((material) => material.dispose());
+    };
+  }, [roomMaterials]);
+
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
@@ -198,8 +206,7 @@ export default function Room({
     });
 
     if (chairTopRef.current) {
-      // Shifting the sine value produces asymmetric amplitude while keeping the cosine derivative intact.
-      const rotationOffset = baseAmplitude * (Math.sin(time * 0.5) - bias);
+      const rotationOffset = BASE_AMPLITUDE * (Math.sin(time * 0.5) - CHAIR_BIAS);
       chairTopRef.current.rotation.y =
         chairTopRef.current.userData.initialRotation.y - rotationOffset;
     }

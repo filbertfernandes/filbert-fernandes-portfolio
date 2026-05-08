@@ -66,9 +66,7 @@ export default function Experience({
   };
 
   useEffect(() => {
-    const goBack = () => {
-      setIsCameraFocused(false);
-
+    if (!isCameraFocused) {
       const cameraPos = isMobile
         ? cameraInitialPosition.mobile
         : cameraInitialPosition.desktop;
@@ -78,19 +76,17 @@ export default function Experience({
         : orbitControlsTarget.desktop;
 
       animateTo(cameraPos, targetPos);
-    };
+    }
+  }, [isCameraFocused]);
 
-    if (!isCameraFocused) goBack();
-
+  useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.code === "Escape") {
-        goBack();
-      }
+      if (event.code === "Escape") setIsCameraFocused(false);
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isCameraFocused]);
+  }, []);
 
   return (
     <>

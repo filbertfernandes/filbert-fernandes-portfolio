@@ -27,10 +27,7 @@ void main() {
     }
 
     finalColor = mix(dayColor, nightColor, uMixRatioTheme);
-
-    if (uMixRatioTheme == 1.0) {
-        finalColor = mix(finalColor, nightLightColor, uMixRatioLight);
-    }
+    finalColor = mix(finalColor, nightLightColor, uMixRatioTheme * uMixRatioLight);
 
     finalColor = pow(finalColor, vec3(1.0/2.2));
     gl_FragColor = vec4(finalColor, 1.0);
