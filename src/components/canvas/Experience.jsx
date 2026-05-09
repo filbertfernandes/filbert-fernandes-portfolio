@@ -1,6 +1,7 @@
 import { CameraControls } from "@react-three/drei";
 import { useRef, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
+import { Box3, Vector3 } from "three";
 
 import Room from "./Room.jsx";
 
@@ -31,7 +32,7 @@ export default function Experience({
       targetPos[0],
       targetPos[1],
       targetPos[2],
-      true
+      true,
     );
   };
 
@@ -86,6 +87,12 @@ export default function Experience({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    controlsRef.current?.setBoundary(
+      new Box3(new Vector3(-4, 0.5, -5), new Vector3(4, 15, 5)),
+    );
   }, []);
 
   return (
