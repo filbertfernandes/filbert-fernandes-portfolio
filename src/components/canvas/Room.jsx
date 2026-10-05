@@ -1,9 +1,10 @@
-import { Html, useCubeTexture, useGLTF, useTexture } from "@react-three/drei";
+import { Html, useGLTF, useTexture } from "@react-three/drei";
 import {
   SRGBColorSpace,
   LinearFilter,
+  LinearMipmapLinearFilter,
   ShaderMaterial,
-  MeshPhysicalMaterial,
+  MeshBasicMaterial,
   DoubleSide,
   Euler,
 } from "three";
@@ -16,20 +17,28 @@ import themeVertexShader from "./shaders/theme/vertex.glsl";
 import themeFragmentShader from "./shaders/theme/fragment.glsl";
 
 import CoffeeSmoke from "./CoffeeSmoke.jsx";
+import { isTouchDevice } from "../../utils/device.js";
 
 const BASE_AMPLITUDE = Math.PI / 6;
 const CHAIR_BIAS = -1;
 
+// Touch devices load 2048px textures (4x less GPU memory than the 4096px set)
+const textureDir = isTouchDevice ? "/textures/room/2k/" : "/textures/room/";
+
+// Mipmaps let a far-away camera (mobile) sample small, cache-friendly mip levels
+// instead of thrashing the full-size texture. Desktop keeps the original filtering.
+const textureMinFilter = isTouchDevice ? LinearMipmapLinearFilter : LinearFilter;
+
 const textureMap = {
   First: {
-    day: "/textures/room/first_texture_set_day.webp",
-    night: "/textures/room/first_texture_set_night.webp",
-    nightLight: "/textures/room/first_texture_set_night_light.webp",
+    day: `${textureDir}first_texture_set_day.webp`,
+    night: `${textureDir}first_texture_set_night.webp`,
+    nightLight: `${textureDir}first_texture_set_night_light.webp`,
   },
   Second: {
-    day: "/textures/room/second_texture_set_day.webp",
-    night: "/textures/room/second_texture_set_night.webp",
-    nightLight: "/textures/room/second_texture_set_night_light.webp",
+    day: `${textureDir}second_texture_set_day.webp`,
+    night: `${textureDir}second_texture_set_night.webp`,
+    nightLight: `${textureDir}second_texture_set_night_light.webp`,
   },
 };
 
@@ -42,19 +51,19 @@ const useRoomTextures = () => {
     day[key] = useTexture(paths.day);
     day[key].flipY = false;
     day[key].colorSpace = SRGBColorSpace;
-    day[key].minFilter = LinearFilter;
+    day[key].minFilter = textureMinFilter;
     day[key].magFilter = LinearFilter;
 
     night[key] = useTexture(paths.night);
     night[key].flipY = false;
     night[key].colorSpace = SRGBColorSpace;
-    night[key].minFilter = LinearFilter;
+    night[key].minFilter = textureMinFilter;
     night[key].magFilter = LinearFilter;
 
     nightLight[key] = useTexture(paths.nightLight);
     nightLight[key].flipY = false;
     nightLight[key].colorSpace = SRGBColorSpace;
-    nightLight[key].minFilter = LinearFilter;
+    nightLight[key].minFilter = textureMinFilter;
     nightLight[key].magFilter = LinearFilter;
   });
 
@@ -78,11 +87,6 @@ export default function Room({
   const chairTopRef = useRef(null);
   const fansRef = useRef([]);
   const gsapTimelinesRef = useRef([]);
-
-  const environmentMap = useCubeTexture(
-    ["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"],
-    { path: "textures/skybox/" }
-  );
 
   useEffect(() => {
     const createMaterialForTextureSet = (textureSet) => {
@@ -117,19 +121,15 @@ export default function Room({
     scene.traverse((child) => {
       if (child.isMesh) {
         if (child.name.includes("Glass")) {
-          child.material = new MeshPhysicalMaterial({
-            transmission: 1,
-            opacity: 1,
-            color: 0xfbfbfb,
-            metalness: 0,
-            roughness: 0,
-            ior: 3,
-            thickness: 0.01,
-            specularIntensity: 1,
-            envMap: environmentMap,
-            envMapIntensity: 1,
+          // Flat alpha-blended haze instead of MeshPhysicalMaterial `transmission`,
+          // which forced an extra full-scene render pass + mipmap generation every
+          // frame. Color/opacity were matched against renders of the old material.
+          child.material = new MeshBasicMaterial({
+            color: 0xf4ffff,
+            transparent: true,
+            opacity: 0.45,
             depthWrite: false,
-            specularColor: 0xfbfbfb,
+            toneMapped: false,
           });
         } else {
           Object.keys(roomMaterials).forEach((key) => {
@@ -328,10 +328,5 @@ const preloadRoomTextures = () => {
 };
 
 preloadRoomTextures();
-
-useCubeTexture.preload(
-  ["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"],
-  { path: "textures/skybox/" }
-);
 
 useGLTF.preload("/models/filbert_room_folio.glb");

@@ -7,6 +7,7 @@ import { useMediaQuery } from "react-responsive";
 import Experience from "./components/canvas/Experience.jsx";
 import LoadingScreen from "./components/ui/LoadingScreen.jsx";
 import { cameraInitialPosition } from "./data/initial.js";
+import { isTouchDevice } from "./utils/device.js";
 
 const App = () => {
   const [isNight, setIsNight] = useState(false);
@@ -74,6 +75,9 @@ const App = () => {
       {/* Canvas */}
       <CanvasWrapper
         canvasProps={{
+          // High-DPI phones (DPR 3) would otherwise render at 2x — 1.5x cuts ~44% of pixels
+          dpr: isTouchDevice ? [1, 1.5] : [1, 2],
+          gl: { powerPreference: "high-performance" },
           camera: {
             fov: 45,
             near: 0.1,
